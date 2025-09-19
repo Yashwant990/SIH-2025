@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import requests
 import numpy as np
+import re
 
 # Load .env file
 load_dotenv()
@@ -16,17 +17,18 @@ SERP_API_KEY = os.getenv("SERP_API_KEY")
 app = Flask(__name__, instance_relative_config=True)
 app.secret_key = "supersecretkey"
 
-def fetch_nsqf_data(query):
+def fetch_ncvct_data(query):
     url = "https://serpapi.com/search.json"
     params = {
         "engine": "google",
-        "q": query + " NSQF qualification site:nsdcindia.org",
+        "q": f"{query} NSQF qualification site:nielit.gov.in",
         "api_key": SERP_API_KEY
     }
     response = requests.get(url, params=params)
     if response.status_code == 200:
         return response.json()
     return {}
+
 
 # Ensure DB folder
 os.makedirs(app.instance_path, exist_ok=True)
@@ -223,23 +225,43 @@ def show_roadmap(topic):
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    roadmap = career_roadmaps.get(topic, None)
-    if roadmap is None:
-        return f"<h2>No roadmap available for '{topic}'</h2><a href='/'>⬅ Back</a>"
-
+    roadmap = career_roadmaps.get(topic, [])
     completed = get_progress(session["user_id"], topic)
-    data = fetch_nsqf_data(topic)
+    data = fetch_ncvct_data(topic)   # use new fetch
+
     results = []
     if "organic_results" in data:
         for r in data["organic_results"]:
             snippet = r.get("snippet", "")
-            if "QP Code" in snippet or "NSQF" in snippet:
-                results.append({
-                    "title": r["title"],
-                    "link": r["link"],
-                    "snippet": snippet
-                })
-    return render_template("roadmap.html", topic=topic, roadmap=roadmap, completed=completed, user=session["username"], roadmap_data=results)
+            title = r.get("title", "")
+            link = r.get("link", "")
+
+            text = f"{title} {snippet}"
+
+            # Extract QP Code
+            match_qp = re.search(r"QP\s*Code[:\s]*([A-Za-z0-9/]+)", text, re.IGNORECASE)
+            qp_code = match_qp.group(1) if match_qp else "N/A"
+
+            # Extract NSQF Level
+            match_level = re.search(r"NSQF\s*Level[:\s]*([0-9]+)", text, re.IGNORECASE)
+            nsqf_level = match_level.group(1) if match_level else "N/A"
+
+            results.append({
+                "qualification": title,
+                "qp_code": qp_code,
+                "nsqf_level": nsqf_level,
+                "details": snippet,
+                "link": link
+            })
+
+    return render_template(
+        "roadmap.html",
+        topic=topic,
+        roadmap=roadmap,
+        completed=completed,
+        user=session["username"],
+        roadmap_data=results
+    )
 
 @app.route("/save_progress", methods=["POST"])
 def save_progress_route():

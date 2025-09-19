@@ -5,22 +5,33 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
-<h2>{{ career }} Roadmap (NSQF-Aligned)</h2>
+<h2>Roadmap (NSQF-Aligned)</h2>
 
-{% if roadmap_data %}
-  <table border="1" cellpadding="8">
-    <tr><th>Qualification</th><th>Details</th><th>Link</th></tr>
-    {% for r in roadmap_data %}
-    <tr>
-      <td>{{ r.title }}</td>
-      <td>{{ r.snippet }}</td>
-      <td><a href="{{ r.link }}" target="_blank">View</a></td>
-    </tr>
-    {% endfor %}
-  </table>
-{% else %}
-  <p>No NSQF qualifications found for {{ career }}.</p>
-{% endif %}
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Qualification</th>
+    <th>QP Code</th>
+    <th>NSQF Level</th>
+    <th>Details</th>
+    <th>Link</th>
+  </tr>
+  {% for r in roadmap_data %}
+  <tr>
+    <td>{{ r.qualification }}</td>
+    <td>{{ r.qp_code }}</td>
+    <td>{{ r.nsqf_level }}</td>
+    <td>{{ r.details }}</td>
+    <td><a href="{{ r.link }}" target="_blank">View</a></td>
+  </tr>
+  {% endfor %}
+</table>
+<h3>Personalized Learning Pathway</h3>
+<ul>
+  <li>Analyzing your profile and prior skills.</li>
+  <li>Mapping career aspirations with industry-driven requirements.</li>
+  <li>Suggesting NSQF-aligned training programs & certifications.</li>
+  <li>Updating recommendations as you progress.</li>
+</ul>
 
 
     <a href="/">⬅ Back</a>
