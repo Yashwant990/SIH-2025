@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ career }} Trends</title>
+</head>
+<body>
+    <h2>Trends for {{ career }}</h2>
+    <ul>
+      {% for t in trends %}
+        <li>{{ t }}</li>
+      {% endfor %}
+    </ul>
+    <a href="/">⬅ Back</a>
+</body>
+</html>

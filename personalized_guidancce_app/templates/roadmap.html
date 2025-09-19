@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ topic }} Roadmap</title>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+<h2>{{ career }} Roadmap (NSQF-Aligned)</h2>
+
+{% if roadmap_data %}
+  <table border="1" cellpadding="8">
+    <tr><th>Qualification</th><th>Details</th><th>Link</th></tr>
+    {% for r in roadmap_data %}
+    <tr>
+      <td>{{ r.title }}</td>
+      <td>{{ r.snippet }}</td>
+      <td><a href="{{ r.link }}" target="_blank">View</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No NSQF qualifications found for {{ career }}.</p>
+{% endif %}
+
+
+    <a href="/">⬅ Back</a>
+</body>
+</html>
