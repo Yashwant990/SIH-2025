@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Your Profile</h2>
+                
+                <!-- Profile Form -->
+                <form method="POST">
+                    <!-- Row 1 -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="interest" class="form-label">Interest</label>
+                            <input type="text" class="form-control" name="interest" id="interest"
+                                   value="{{ profile[0] if profile else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="time_per_week" class="form-label">Time per Week</label>
+                            <input type="text" class="form-control" name="time_per_week" id="time_per_week"
+                                   value="{{ profile[1] if profile else '' }}">
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="current_education" class="form-label">Current Education</label>
+                            <input type="text" class="form-control" name="current_education" id="current_education"
+                                   value="{{ profile[2] if profile else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="skills_want_to_learn" class="form-label">Skills to Learn</label>
+                            <input type="text" class="form-control" name="skills_want_to_learn" id="skills_want_to_learn"
+                                   value="{{ profile[3] if profile else '' }}">
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="mb-4">
+                        <label for="career_goal" class="form-label">Career Goal</label>
+                        <textarea class="form-control" name="career_goal" id="career_goal" rows="4">{{ profile[4] if profile else '' }}</textarea>
+                    </div>
+
+                    <!-- Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-indigo btn-lg px-4">
+                            <i class="fas fa-save me-2"></i>Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        {% if profile %}
+        <div class="card">
+            <div class="card-body p-4">
+                <h4 class="mb-3">Saved Profile Information</h4>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Interest</th>
+                            <td>{{ profile[0] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Time per Week</th>
+                            <td>{{ profile[1] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Current Education</th>
+                            <td>{{ profile[2] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Skills to Learn</th>
+                            <td>{{ profile[3] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Career Goal</th>
+                            <td>{{ profile[4] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-dark mb-4">Find Your Perfect Career Path in Tech</h1>
+        <p class="lead text-muted mb-5">Upload your resume or skills, and let our AI-powered guide show you the way.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('signup') }}" class="btn btn-indigo btn-lg px-4 py-3">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4 py-3">Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

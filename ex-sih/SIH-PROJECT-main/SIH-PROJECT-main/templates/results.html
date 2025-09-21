@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Your Career Recommendations</h2>
+
+    <!-- Skills Found -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Extracted Skills</h4>
+            {% if skills %}
+                <ul class="list-group">
+                    {% for skill in skills %}
+                        <li class="list-group-item">{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No skills extracted from your resume.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Career Recommendations -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Recommended Careers</h4>
+            {% if careers %}
+                <div class="list-group">
+                    {% for career in careers %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <!-- Career name + score -->
+                            <div>
+                                <strong>{{ career.career }}</strong>
+                                <span class="badge bg-indigo ms-2">
+                                    {{ (career.score * 100) | round(1) }}%
+                                </span>
+                            </div>
+                            <!-- Action buttons -->
+                            <div>
+                                <a href="{{ url_for('show_roadmap', topic=career.career) }}" 
+                                   class="btn btn-sm btn-primary me-2">
+                                    Roadmap
+                                </a>
+                                <a href="{{ url_for('show_trends', career=career.career) }}" 
+                                   class="btn btn-sm btn-secondary">
+                                    Trends
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No career recommendations available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
