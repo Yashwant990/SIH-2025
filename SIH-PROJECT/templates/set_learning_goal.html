@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}Set Learning Goal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">🎯 Set Your Learning Goal</h3>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="skill_name" class="form-label">What do you want to learn?</label>
+                        <input type="text" class="form-control" name="skill_name" id="skill_name"
+                            value="{{ suggested_skill }}" placeholder="e.g., Python, JavaScript, SQL" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="target_date" class="form-label">Target Completion Date (Optional)</label>
+                        <input type="date" class="form-control" name="target_date" id="target_date">
+                    </div>
+                    <button type="submit" class="btn btn-indigo w-100">
+                        <i class="fas fa-magic me-2"></i> Generate My Roadmap
+                    </button>
+                </form>
+                <div class="mt-3 text-center">
+                    <small class="text-muted">We’ll create a personalized step-by-step plan for you.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

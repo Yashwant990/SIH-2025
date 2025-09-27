@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}Your Career Roadmap: {{ roadmap.target_career }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">🚀 Your Path to Becoming a</h1>
+        <h2 class="text-primary mb-4">{{ roadmap.target_career }}</h2>
+        <p class="lead">Personalized based on your profile, goals, and availability.</p>
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-sm">← Back to Profile</a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            {% for phase in roadmap.phases %}
+            <div class="card mb-5 shadow-sm border-left-primary">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ phase.phase_name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for skill in phase.skills %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ skill.skill_name }}</h5>
+                                    <p class="card-text text-muted flex-grow-1">{{ skill.description }}</p>
+                                    <p class="text-primary"><small>⏱️ ~{{ skill.estimated_hours }} hours</small></p>
+                                    <form action="{{ url_for('add_skill_to_goals') }}" method="POST" class="mt-auto">
+                                        <input type="hidden" name="skill_name" value="{{ skill.skill_name }}">
+                                        <input type="hidden" name="description" value="{{ skill.description }}">
+                                        <input type="hidden" name="estimated_hours" value="{{ skill.estimated_hours }}">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                            <i class="fas fa-plus-circle me-1"></i> Add to My Goals
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

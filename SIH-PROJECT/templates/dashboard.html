@@ -1,0 +1,506 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold text-dark mb-2">Your Career Dashboard</h1>
+                    <p class="text-muted lead">Discover your potential with AI-powered skill analysis and personalized career recommendations</p>
+                </div>
+                <div class="d-none d-lg-block">
+                    <div class="bg-light rounded-circle p-4">
+                        <i class="fas fa-chart-line text-primary fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Upload Section -->
+        <div class="col-12">
+            <div class="card border-0 shadow-lg position-relative overflow-hidden">
+                <!-- Background decoration -->
+                <div class="position-absolute top-0 end-0 opacity-25" style="z-index: 1;">
+                    <svg width="300" height="200" viewBox="0 0 300 200">
+                        <path d="M0,100 Q150,0 300,100 L300,200 L0,200 Z" fill="#6f42c1" opacity="0.1"/>
+                        <path d="M0,120 Q150,20 300,120 L300,200 L0,200 Z" fill="#0d6efd" opacity="0.1"/>
+                    </svg>
+                </div>
+                
+                <div class="card-body p-5 position-relative" style="z-index: 2;">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-brain text-white fs-3"></i>
+                                </div>
+                                <div>
+                                    <h2 class="card-title mb-1 fw-bold">Analyze Your Skills</h2>
+                                    <p class="text-muted mb-0">Upload your resume or skills file to get personalized career insights</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted mb-4 fs-6">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                Upload your resume (txt file) or a file with a list of your skills, one per line. Our AI will analyze your profile and suggest the best career paths aligned with NSQF standards.
+                            </p>
+                        </div>
+                        <div class="col-lg-4 text-center d-none d-lg-block">
+                            <div class="position-relative">
+                                <div class="upload-animation">
+                                    <i class="fas fa-cloud-upload-alt text-primary" style="font-size: 5rem; opacity: 0.3;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form action="/upload_resume" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <label for="file" class="form-label fw-semibold">
+                                    <i class="fas fa-file-upload text-primary me-2"></i>Resume or Skills File
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" class="form-control form-control-lg" name="file" id="file" required 
+                                           accept=".txt,.pdf,.doc,.docx">
+                                    <div class="invalid-feedback">
+                                        Please select a valid file.
+                                    </div>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-check-circle text-success me-1"></i>Supported formats: TXT, PDF, DOC, DOCX
+                                </div>
+                            </div>
+                            <!-- for optional information about the user -->
+                            <div class="col-lg-6">
+                                <label for="aspiration" class="form-label fw-semibold">
+                                    <i class="fas fa-bullseye text-success me-2"></i>Your Career Aspiration
+                                    <span class="badge bg-light text-muted ms-2">Optional</span>
+                                </label>
+                                <input type="text" class="form-control form-control-lg" name="aspiration" id="aspiration" 
+                                       value="{{ aspiration if aspiration else '' }}" 
+                                       placeholder="e.g., 'AI Engineer', 'Web Developer', 'Data Scientist'">
+                                <div class="form-text">
+                                    <i class="fas fa-lightbulb text-warning me-1"></i>Help us personalize your recommendations
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-indigo btn-lg px-4 py-3 shadow-lg">
+                                    <i class="fas fa-search me-2"></i>Analyze My Profile
+                                    <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+{% if session.resume_task_id %}
+  <div class="mt-3">
+    <a href="{{ url_for('resume_status') }}" class="btn btn-primary">
+      Check Resume Status
+    </a>
+  </div>
+{% endif %}
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
+        {% if skills or careers %}
+        <!-- Results Section -->
+        <div class="col-12">
+            <div class="row g-4">
+                <!-- Skills Section -->
+                {% if skills %}
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-lg">
+                        <div class="card-header bg-transparent border-0 pb-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-cogs text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title mb-1 fw-bold">Extracted Skills</h3>
+                                    <p class="text-muted small mb-0">{{ skills|length }} skills identified from your profile</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="skills-container">
+                                {% for skill in skills %}
+                                <span class="skill-badge enhanced-skill">
+                                    <i class="fas fa-star text-warning me-1"></i>
+                                    {{ skill }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-chart-pie text-info me-2"></i>
+                                    <small class="text-muted">
+                                        <strong>Skill Analysis Complete:</strong> These skills have been mapped against industry requirements and NSQF standards.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Careers Section -->
+                {% if careers %}
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-lg">
+                        <div class="card-header bg-transparent border-0 pb-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-route text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title mb-1 fw-bold">Recommended Career Paths</h3>
+                                    <p class="text-muted small mb-0">AI-powered recommendations based on your profile</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="career-paths">
+                                {% for career in careers %}
+                                <div class="career-item p-3 mb-3 bg-light rounded hover-lift">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-briefcase text-primary me-2"></i>
+                                                <a href="{{ url_for('show_roadmap', topic=career.career) }}" 
+                                                   class="text-indigo text-decoration-none fw-bold fs-5 career-link">
+                                                   {{ career.career }}
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="confidence-bar mb-2">
+                                                <div class="d-flex align-items-center justify-content-between small text-muted mb-1">
+                                                    <span>Match Confidence</span>
+                                                    <span class="fw-bold">{{ career.score }}</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    {% set score_percent = (career.score | replace('%', '') | int) %}
+                                                    <div class="progress-bar 
+                                                        {% if score_percent >= 80 %}bg-success
+                                                        {% elif score_percent >= 60 %}bg-warning
+                                                        {% else %}bg-info
+                                                        {% endif %}" 
+                                                        style="width: {{ score_percent }}%;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="ms-3">
+                                            <a href="{{ url_for('show_trends', career=career.career) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-chart-line me-1"></i>View Trends
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 pt-3 border-top border-light">
+                                        <div class="row g-2 text-center">
+                                            <div class="col-4">
+                                                <div class="small text-muted">
+                                                    <i class="fas fa-graduation-cap text-success"></i>
+                                                    <div>NSQF Aligned</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="small text-muted">
+                                                    <i class="fas fa-trending-up text-info"></i>
+                                                    <div>High Growth</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="small text-muted">
+                                                    <i class="fas fa-users text-warning"></i>
+                                                    <div>In Demand</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-primary bg-gradient text-white rounded">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-rocket me-2"></i>
+                                    <small>
+                                        <strong>Next Steps:</strong> Click on any career path to view detailed learning roadmaps and certification requirements.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <!-- Getting Started Guide -->
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-compass text-primary" style="font-size: 4rem; opacity: 0.5;"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-3">Ready to Discover Your Career Path?</h3>
+                    <p class="text-muted lead mb-4">Upload your resume or skills file above to get started with personalized AI-powered career recommendations.</p>
+                    
+                    <div class="row g-4 mt-4">
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-upload text-white fs-4"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">1. Upload</h6>
+                                <p class="small text-muted text-center">Share your resume or skills list</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-robot text-white fs-4"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">2. Analyze</h6>
+                                <p class="small text-muted text-center">AI analyzes your profile</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <div class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-map text-white fs-4"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">3. Discover</h6>
+                                <p class="small text-muted text-center">Get personalized career paths</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Check if a task ID is present in the server-side session
+    {% if session.resume_task_id %}
+        const interval = setInterval(() => {
+            fetch("{{ url_for('resume_status') }}") // Poll the status endpoint
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "SUCCESS") {
+                        clearInterval(interval);
+                        // CRITICAL FIX: The task succeeded and results are saved in the session by app.py.
+                        // Force a full page reload so Jinja re-renders the page with the full, styled results section.
+                        window.location.reload(); 
+                    } else if (data.status === "FAILURE") {
+                        clearInterval(interval);
+                        // Optional: show an error message without reloading
+                        console.error("Resume analysis failed.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Polling error:", err);
+                    clearInterval(interval);
+                });
+        }, 3000); // Poll every 3 seconds
+    {% endif %}
+});
+</script>
+
+
+<style>
+.enhanced-skill {
+    display: inline-block;
+    background: linear-gradient(135deg, #6f42c1, #0d6efd);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    margin: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 8px rgba(111, 66, 193, 0.3);
+}
+
+.enhanced-skill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(111, 66, 193, 0.4);
+}
+
+.career-item {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.career-item:hover {
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.15);
+}
+
+.career-link {
+    transition: color 0.3s ease;
+}
+
+.career-link:hover {
+    color: #0d6efd !important;
+    text-decoration: underline !important;
+}
+
+.file-upload-wrapper {
+    position: relative;
+}
+
+.file-upload-wrapper input[type="file"] {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.file-upload-wrapper input[type="file"]:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+
+.upload-animation {
+    animation: float 6s ease-in-out infinite;
+}
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+}
+
+.confidence-bar .progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.confidence-bar .progress-bar {
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+.btn-indigo {
+    background: linear-gradient(135deg, #6f42c1, #0d6efd);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-indigo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(111, 66, 193, 0.3);
+    color: white;
+}
+
+.skills-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.skills-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.skills-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.skills-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6f42c1, #0d6efd);
+    border-radius: 10px;
+}
+
+.career-paths {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.career-paths::-webkit-scrollbar {
+    width: 6px;
+}
+
+.career-paths::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.career-paths::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6f42c1, #0d6efd);
+    border-radius: 10px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Form validation styles */
+.needs-validation .form-control:invalid {
+    border-color: #dc3545;
+}
+
+.needs-validation .form-control:valid {
+    border-color: #198754;
+}
+
+.skills-container .enhanced-skill {
+    animation: slideIn 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.skills-container .enhanced-skill:nth-child(1) { animation-delay: 0.1s; }
+.skills-container .enhanced-skill:nth-child(2) { animation-delay: 0.2s; }
+.skills-container .enhanced-skill:nth-child(3) { animation-delay: 0.3s; }
+.skills-container .enhanced-skill:nth-child(4) { animation-delay: 0.4s; }
+.skills-container .enhanced-skill:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+</style>
+
+{% endblock %}

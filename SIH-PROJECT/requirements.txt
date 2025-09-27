@@ -1,0 +1,12 @@
+flask
+dotenv
+Flask
+gunicorn
+flask-session
+redis
+celery[redis]
+psycopg2-binary
+sqlalchemy
+boto3
+python-dotenv
+requests
