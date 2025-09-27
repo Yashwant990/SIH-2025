@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}Learning Pace Test{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">📝 Learning Pace Test</h2>
+    <form method="POST">
+        {% for q in questions %}
+        <div class="mb-3">
+            <label class="form-label"><strong>{{ q.text }}</strong></label>
+            {% for option in q.options %}
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="q{{ q.id }}" value="{{ option }}" required>
+                <label class="form-check-label">{{ option }}</label>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit Test</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}Generate Career Roadmap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">🎯 What Career Do You Want?</h3>
+                <p class="text-muted text-center mb-4">We’ll build a personalized roadmap to get you there.</p>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="career_goal" class="form-label">Target Career Title</label>
+                        <input type="text" class="form-control" name="career_goal" id="career_goal" placeholder="e.g., Frontend Developer, Data Scientist, Game Designer" required>
+                    </div>
+                    <button type="submit" class="btn btn-indigo w-100">
+                        <i class="fas fa-magic me-2"></i> Generate My Career Path
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

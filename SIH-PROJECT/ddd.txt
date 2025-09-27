@@ -1,0 +1,14 @@
+import sqlite3
+
+# Connect to your database
+conn = sqlite3.connect("..instance/db.sqlite3")
+cursor = conn.cursor()
+
+print("Connected to db.sqlite3! Type 'help()' for commands.")
+
+# Helper function to query
+def q(sql):
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    for r in rows:
+        print(r)

@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block title %}Your Learning Path: {{ goal.skill_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">🚀 Your Personalized Learning Path</h1>
+        <h2 class="mb-1">{{ goal.skill_name }}</h2>
+        <p class="lead text-muted">
+            {% if goal.target_date %}🎯 Complete by {{ goal.target_date }}{% else %}📅 No deadline set{% endif %}
+        </p>
+
+        <!-- Progress Bar -->
+        <div class="progress w-75 mx-auto mt-3" style="height: 12px; border-radius: 6px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ goal.progress_percent }}%" aria-valuenow="{{ goal.progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p class="mt-2"><strong>{{ goal.completed_steps }}/{{ goal.total_steps }} steps completed</strong></p>
+
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-sm mt-3">
+            ← Back to Profile
+        </a>
+    </div>
+
+    <!-- Learning Path Timeline -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="position-relative">
+
+                <!-- Vertical Connector Line -->
+                <div class="position-absolute h-100 start-50 translate-middle-x border-start border-2 border-primary" style="z-index: 0;"></div>
+
+                {% for step in roadmap_steps %}
+                    {% set is_completed = step.completed %}
+                    {% set is_current = not step.completed and loop.index0 == goal.completed_steps %}
+                    {% set color_class = "bg-success" if is_completed else ("bg-warning" if is_current else "bg-light") %}
+                    {% set icon = "✓" if is_completed else (loop.index if not is_completed else "") %}
+
+                    <!-- Step Item -->
+                    <div class="d-flex mb-5 position-relative" style="z-index: 1;">
+                        <!-- Step Dot + Icon -->
+                        <div class="flex-shrink-0 me-3 d-flex align-items-center justify-content-center rounded-circle {{ color_class }} text-white" style="width: 40px; height: 40px; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                            {{ icon }}
+                        </div>
+
+                        <!-- Step Content Card -->
+                        <div class="flex-grow-1 bg-white p-4 rounded shadow-sm border {{ 'border-success' if is_completed else ('border-warning' if is_current else 'border-light') }}">
+                            <h5 class="mb-2">
+                                Step {{ loop.index }}: {{ step.step_title }}
+                                {% if is_completed %}
+                                    <span class="badge bg-success ms-2">Completed</span>
+                                {% elif is_current %}
+                                    <span class="badge bg-warning text-dark ms-2">Next Up</span>
+                                {% endif %}
+                            </h5>
+                            <p class="text-muted mb-3">{{ step.description }}</p>
+                            {% if step.estimated_hours %}
+                                <p class="mb-2"><small class="fw-bold">⏱️ Estimated Time:</small> <span class="text-primary">{{ step.estimated_hours }} hours</span></p>
+                            {% endif %}
+                            <div class="form-check">
+                                <input class="form-check-input step-checkbox" type="checkbox" data-step-id="{{ step.id }}" {% if step.completed %}checked{% endif %}>
+                                <label class="form-check-label">
+                                    {% if step.completed %}
+                                        Completed ✓
+                                    {% else %}
+                                        Mark as Complete
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Banner (if completed) -->
+    {% if goal.status == 'completed' %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-8">
+            <div class="alert alert-success text-center rounded-3 py-4">
+                <h2 class="mb-3">🎉 Congratulations, {{ session.username }}!</h2>
+                <p class="lead">You’ve successfully completed your <strong>{{ goal.skill_name }}</strong> learning path!</p>
+                <p>Your skill has been added to your <strong>Completed Skills</strong> section.</p>
+                <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg mt-2">View Your Profile</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for Checkbox Toggle -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.step-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const stepId = this.getAttribute('data-step-id');
+            const isChecked = this.checked;
+
+            fetch('/complete_step', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ step_id: stepId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'saved') {
+                    location.reload(); // Refresh to update progress & UI
+                } else {
+                    alert('Error saving progress.');
+                    this.checked = !isChecked;
+                }
+            })
+            .catch(() => {
+                alert('Network error.');
+                this.checked = !isChecked;
+            });
+        });
+    });
+});
+</script>
+
+<style>
+/* Optional: Add animation when completing step */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.step-checkbox:checked + label {
+    color: #28a745;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
